@@ -35,7 +35,8 @@ find <- function(
 
     if (Sys.which(command) != "") {
         version <- get_version(command)
-        if (version >= minimum.version) {
+        if (!is.na(version) && version >= minimum.version) {
+            cached$previous <- command
             return(command)
         }
     }
@@ -51,5 +52,13 @@ get_version <- function(command) {
     test <- system2(command, "--version", stdout=TRUE)
     vstring <- test[grep("cmake version ", test[1])]
     vstring <- gsub("cmake version ", "", vstring)
-    package_version(vstring)
+    to_version(vstring)
+}
+
+to_version <- function(version) {
+    # Remove modifiers like -alpha, -beta, rc1, etc.
+    if (grepl("^[0-9]+\\.[0-9]+\\.[0-9]+[^0-9]", version)) {
+        version <- sub("^([0-9]+\\.[0-9]+\\.[0-9]+)[^0-9].*", "\\1", version)
+    }
+    package_version(version, strict=FALSE)
 }
