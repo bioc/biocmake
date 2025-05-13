@@ -36,7 +36,6 @@ find <- function(
     if (Sys.which(command) != "") {
         version <- get_version(command)
         if (!is.na(version) && version >= minimum.version) {
-            cached$previous <- command
             return(command)
         }
     }
